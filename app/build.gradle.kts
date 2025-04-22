@@ -12,8 +12,8 @@ android {
         applicationId = "dev.parham.zapri"
         minSdk = 26
         targetSdk = 35
-        versionCode = 5
-        versionName = "1.0.4"
+        versionCode = 6
+        versionName = "1.0.5"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -44,9 +44,9 @@ android {
         if (isCiBuild) {
             create("release") {
                 storeFile = file("release-key.jks")
-                storePassword = project.findProperty("SIGNING_KEY_STORE_PASSWORD") as String
-                keyAlias = project.findProperty("SIGNING_KEY_ALIAS") as String
-                keyPassword = project.findProperty("SIGNING_KEY_PASSWORD") as String
+                storePassword = System.getenv("SIGNING_KEY_STORE_PASSWORD") ?: ""
+                keyAlias = System.getenv("SIGNING_KEY_ALIAS") ?: ""
+                keyPassword = System.getenv("SIGNING_KEY_PASSWORD") ?: ""
             }
         }
     }
