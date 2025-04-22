@@ -35,7 +35,7 @@ jobs:
 
       - name: Build release APK and AAB
         run: ./gradlew bundleRelease assembleRelease
-        working-directory: ./zapri
+        working-directory: .
 
       - name: Rename output files with version
         run: |
