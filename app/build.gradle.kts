@@ -12,8 +12,8 @@ android {
         applicationId = "dev.parham.zapri"
         minSdk = 26
         targetSdk = 35
-        versionCode = 1
-        versionName = "1.0.0"
+        versionCode = 2
+        versionName = "1.0.1"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -36,6 +36,27 @@ android {
     }
     buildFeatures {
         compose = true
+    }
+
+    val isCiBuild = System.getenv("CI") != null
+
+    signingConfigs {
+        if (isCiBuild) {
+            create("release") {
+                storeFile = file("release-key.jks")
+                storePassword = project.findProperty("SIGNING_KEY_STORE_PASSWORD") as String
+                keyAlias = project.findProperty("SIGNING_KEY_ALIAS") as String
+                keyPassword = project.findProperty("SIGNING_KEY_PASSWORD") as String
+            }
+        }
+    }
+    buildTypes {
+        getByName("release") {
+            isMinifyEnabled = false
+            if (isCiBuild) {
+                signingConfig = signingConfigs.getByName("release")
+            }
+        }
     }
 }
 

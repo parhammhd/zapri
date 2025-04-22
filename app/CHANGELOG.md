@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ---
 
+## [1.0.1] - 2025-04-11
+### Changed
+- Initial automated release test via GitHub Actions. No functional changes.
+
 ## [1.0.0] - 2025-04-11
 ### Added
 - Initial release of Zapri

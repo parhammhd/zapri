@@ -1,0 +1,64 @@
+name: Build & Release APK
+
+on:
+  push:
+    tags:
+      - 'v*'  # Triggers on version tags like v1.0.0
+
+jobs:
+  build:
+    name: Build & Sign Release APK
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up JDK
+        uses: actions/setup-java@v3
+        with:
+          distribution: 'temurin'
+          java-version: 17
+
+      - name: Decode Keystore from Secret
+        run: |
+          echo "${{ secrets.SIGNING_KEY }}" | base64 -d > release-key.jks
+
+      - name: Set up gradle.properties
+        run: |
+          echo "SIGNING_KEY_ALIAS=${{ secrets.SIGNING_KEY_ALIAS }}" >> local.properties
+          echo "SIGNING_KEY_PASSWORD=${{ secrets.SIGNING_KEY_PASSWORD }}" >> local.properties
+          echo "SIGNING_KEY_STORE_PASSWORD=${{ secrets.SIGNING_KEY_STORE_PASSWORD }}" >> local.properties
+
+      - name: Grant execute permission for Gradle
+        run: chmod +x ./gradlew
+
+      - name: Build release APK and AAB
+        run: ./gradlew bundleRelease assembleRelease
+        working-directory: ./zapri
+
+      - name: Rename output files with version
+        run: |
+          TAG_NAME="${GITHUB_REF##*/}"  # e.g. v1.0.0
+          mv zapri/app/build/outputs/apk/release/app-release.apk "zapri-${TAG_NAME}.apk"
+          mv zapri/app/build/outputs/bundle/release/app-release.aab "zapri-${TAG_NAME}.aab"
+
+      - name: Extract changelog for release
+        id: changelog
+        run: |
+          TAG_NAME="${GITHUB_REF##*/}"
+          echo "Reading changelog for tag $TAG_NAME..."
+          CHANGELOG=$(awk "/## \\[?${TAG_NAME#v}\\]?/ {flag=1; next} /^## /{flag=0} flag" zapri/app/CHANGELOG.md)
+          echo "changelog<<EOF" >> $GITHUB_OUTPUT
+          echo "$CHANGELOG" >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
+
+      - name: Upload APK and AAB to GitHub Release
+        uses: softprops/action-gh-release@v1
+        with:
+          files: |
+            zapri-v*.apk
+            zapri-v*.aab
+          body: ${{ steps.changelog.outputs.changelog }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
