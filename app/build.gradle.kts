@@ -12,8 +12,8 @@ android {
         applicationId = "dev.parham.zapri"
         minSdk = 26
         targetSdk = 35
-        versionCode = 6
-        versionName = "1.0.5"
+        versionCode = 7
+        versionName = "1.0.6"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -43,7 +43,7 @@ android {
     signingConfigs {
         if (isCiBuild) {
             create("release") {
-                storeFile = file("release-key.jks")
+                storeFile = file("app/release-key.jks")
                 storePassword = System.getenv("SIGNING_KEY_STORE_PASSWORD") ?: ""
                 keyAlias = System.getenv("SIGNING_KEY_ALIAS") ?: ""
                 keyPassword = System.getenv("SIGNING_KEY_PASSWORD") ?: ""
