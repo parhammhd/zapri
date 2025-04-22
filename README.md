@@ -19,10 +19,3 @@
 ### 📝 License
 
 Zapri is licensed under the [GNU General Public License v3.0](./LICENSE).
-
-### 🔧 Build Instructions
-
-1. Clone the repository:
-   ```bash
-   git clone https://github.com/your-username/zapri.git
-   cd zapri
