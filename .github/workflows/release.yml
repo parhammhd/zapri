@@ -35,20 +35,19 @@ jobs:
 
       - name: Build release APK and AAB
         run: ./gradlew bundleRelease assembleRelease
-        working-directory: .
 
       - name: Rename output files with version
         run: |
           TAG_NAME="${GITHUB_REF##*/}"  # e.g. v1.0.0
-          mv zapri/app/build/outputs/apk/release/app-release.apk "zapri-${TAG_NAME}.apk"
-          mv zapri/app/build/outputs/bundle/release/app-release.aab "zapri-${TAG_NAME}.aab"
+          mv app/build/outputs/apk/release/app-release.apk "zapri-${TAG_NAME}.apk"
+          mv app/build/outputs/bundle/release/app-release.aab "zapri-${TAG_NAME}.aab"
 
       - name: Extract changelog for release
         id: changelog
         run: |
           TAG_NAME="${GITHUB_REF##*/}"
           echo "Reading changelog for tag $TAG_NAME..."
-          CHANGELOG=$(awk "/## \\[?${TAG_NAME#v}\\]?/ {flag=1; next} /^## /{flag=0} flag" zapri/app/CHANGELOG.md)
+          CHANGELOG=$(awk "/## \\[?${TAG_NAME#v}\\]?/ {flag=1; next} /^## /{flag=0} flag" app/CHANGELOG.md)
           echo "changelog<<EOF" >> $GITHUB_OUTPUT
           echo "$CHANGELOG" >> $GITHUB_OUTPUT
           echo "EOF" >> $GITHUB_OUTPUT

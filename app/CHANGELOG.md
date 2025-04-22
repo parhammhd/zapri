@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ---
 
+## [1.0.4] - 2025-04-22
+### Changed
+- Fourth automated release test via GitHub Actions. No functional changes.
+
 ## [1.0.3] - 2025-04-22
 ### Changed
 - Third automated release test via GitHub Actions. No functional changes.
