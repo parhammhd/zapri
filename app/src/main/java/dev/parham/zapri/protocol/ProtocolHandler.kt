@@ -1,13 +1,16 @@
 package dev.parham.zapri.protocol
 
-import android.content.Context
+import androidx.compose.runtime.Composable
 import dev.parham.zapri.data.model.PageData
 import dev.parham.zapri.protocol.gemini.GeminiClient
+import dev.parham.zapri.protocol.gemini.GeminiParser
+import dev.parham.zapri.protocol.gemini.GeminiRenderer
+import dev.parham.zapri.protocol.gemini.GemtextElement
 import dev.parham.zapri.utils.UrlParser
 
 object ProtocolHandler {
 
-    fun fetch(url: String, context: Context): PageData {
+    fun fetch(url: String, context: android.content.Context): PageData {
         val parsedUrl = UrlParser.parse(url)
             ?: return PageData(
                 statusCode = -1,
@@ -19,46 +22,11 @@ object ProtocolHandler {
 
         return when (parsedUrl.protocol) {
             "gemini" -> GeminiClient.fetch(url, context)
-            "gopher" -> PageData(
+            "gopher", "finger", "scroll", "nex", "spartan", "text" -> PageData(
                 statusCode = -1,
                 meta = "",
                 content = null,
-                errorMessage = "Gopher protocol is not yet implemented.",
-                statusMessage = "Protocol Not Implemented"
-            )
-            "finger" -> PageData(
-                statusCode = -1,
-                meta = "",
-                content = null,
-                errorMessage = "Finger protocol is not yet implemented.",
-                statusMessage = "Protocol Not Implemented"
-            )
-            "scroll" -> PageData(
-                statusCode = -1,
-                meta = "",
-                content = null,
-                errorMessage = "Scroll protocol is not yet implemented.",
-                statusMessage = "Protocol Not Implemented"
-            )
-            "nex" -> PageData(
-                statusCode = -1,
-                meta = "",
-                content = null,
-                errorMessage = "Nex protocol is not yet implemented.",
-                statusMessage = "Protocol Not Implemented"
-            )
-            "spartan" -> PageData(
-                statusCode = -1,
-                meta = "",
-                content = null,
-                errorMessage = "Spartan protocol is not yet implemented.",
-                statusMessage = "Protocol Not Implemented"
-            )
-            "text" -> PageData(
-                statusCode = -1,
-                meta = "",
-                content = null,
-                errorMessage = "Text protocol is not yet implemented.",
+                errorMessage = "${parsedUrl.protocol.capitalize()} protocol is not yet implemented.",
                 statusMessage = "Protocol Not Implemented"
             )
             else -> PageData(
@@ -70,5 +38,26 @@ object ProtocolHandler {
             )
         }
     }
-}
 
+    fun parseContent(pageData: PageData, baseUrl: String): List<GemtextElement> {
+        val parsedUrl = UrlParser.parse(baseUrl)
+            ?: return emptyList()
+
+        return when (parsedUrl.protocol) {
+            "gemini" -> pageData.content?.let { GeminiParser.parse(it, baseUrl) } ?: emptyList()
+            else -> emptyList() // Later, other protocol parsers can be added here
+        }
+    }
+
+    @Composable
+    fun renderContent(
+        elements: List<GemtextElement>,
+        onLinkClick: (String) -> Unit
+    ) {
+        val parsedUrl = elements.firstOrNull()
+        // Currently assume it's Gemini (later: expand if different types)
+        elements.forEach { element ->
+            GeminiRenderer.RenderGemtextElement(element, onLinkClick)
+        }
+    }
+}

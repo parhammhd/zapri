@@ -1,4 +1,4 @@
-package dev.parham.zapri.utils
+package dev.parham.zapri.protocol.gemini
 
 import android.content.Context
 import java.io.File

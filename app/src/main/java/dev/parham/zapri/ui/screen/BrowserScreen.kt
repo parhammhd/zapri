@@ -99,14 +99,9 @@ fun BrowserScreen(navController: NavHostController, modifier: Modifier = Modifie
                     } else {
                         "$normalizedBaseUrl$processedUrl"
                     }
-                    val finalUrl = if (appendedUrl.endsWith(".gmi") || appendedUrl.endsWith("/")) {
-                        appendedUrl
-                    } else {
-                        "$appendedUrl/"
-                    }
-                    currentUrl = TextFieldValue(finalUrl)
+                    currentUrl = TextFieldValue(appendedUrl)
                     val result = withContext(Dispatchers.IO) {
-                        ProtocolHandler.fetch(finalUrl, context)
+                        ProtocolHandler.fetch(appendedUrl, context)
                     }
                     pageData = result
                 }

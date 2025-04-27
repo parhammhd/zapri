@@ -15,7 +15,7 @@ fun ProtocolIcon(protocol: String, modifier: Modifier = Modifier) {
         "gopher" -> Icons.Default.Explore // Example icon for Gopher
         "finger" -> Icons.Default.Person // Example icon for Finger
         "scroll" -> Icons.Default.Description // Example icon for Scroll
-        "nex" -> Icons.Default.Cloud // Example icon for Nex
+        "nex" -> Icons.Default.Subway // Example icon for Nex
         "spartan" -> Icons.Default.Shield // Example icon for Spartan
         "text" -> Icons.AutoMirrored.Filled.TextSnippet // Example icon for Text
         else -> Icons.AutoMirrored.Filled.Help // Default icon for unknown protocols
