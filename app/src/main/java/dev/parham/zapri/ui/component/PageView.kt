@@ -39,7 +39,7 @@ fun PageView(
                         .fillMaxWidth()
                         .verticalScroll(rememberScrollState())
                 ) {
-                    ProtocolHandler.renderContent(elements, onLinkClick)
+                    ProtocolHandler.RenderContent(elements, onLinkClick)
                 }
             }
             else -> {

@@ -1,4 +1,4 @@
-package dev.parham.zapri.protocol.gemini
+package dev.parham.zapri.protocol.text
 
 import androidx.compose.foundation.text.ClickableText
 import androidx.compose.foundation.layout.*
@@ -11,26 +11,25 @@ import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 
-object GeminiRenderer {
-
+object TextRenderer {
     @Composable
-    fun RenderGemtextElement(
-        element: GemtextElement,
+    fun RenderTextElement(
+        element: TextElement,
         onLinkClick: (String) -> Unit
     ) {
         when (element) {
-            is GemtextElement.Link -> {
+            is TextElement.Link -> {
                 val linkColor = when {
-                    // Internal links (gemini or relative)
-                    element.url.startsWith("gemini://") || !element.url.contains("://") ->
+                    // Internal links (text or relative)
+                    element.url.startsWith("text://") || !element.url.contains("://") ->
                         MaterialTheme.colorScheme.primary
                     // Supported external protocols
+                    element.url.startsWith("gemini://") ||
                     element.url.startsWith("gopher://") ||
                     element.url.startsWith("finger://") ||
                     element.url.startsWith("nex://") ||
                     element.url.startsWith("scroll://") ||
                     element.url.startsWith("spartan://") ||
-                    element.url.startsWith("text://") ||
                     element.url.startsWith("browser://") ||
                     element.url.startsWith("local://") ->
                         MaterialTheme.colorScheme.secondary
@@ -46,13 +45,14 @@ object GeminiRenderer {
                             textDecoration = TextDecoration.Underline
                         )
                     ) {
-                        append(element.description)
+                        append(element.text)
                     }
                     pop()
                 }
 
                 ClickableText(
                     text = annotatedString,
+                    style = MaterialTheme.typography.bodyLarge,
                     onClick = { offset ->
                         annotatedString.getStringAnnotations(tag = "URL", start = offset, end = offset)
                             .firstOrNull()?.let { annotation ->
@@ -62,52 +62,17 @@ object GeminiRenderer {
                     modifier = Modifier.padding(vertical = 4.dp)
                 )
             }
-            is GemtextElement.Heading -> {
-                Text(
-                    text = element.text,
-                    style = when (element.level) {
-                        1 -> MaterialTheme.typography.headlineLarge
-                        2 -> MaterialTheme.typography.headlineMedium
-                        else -> MaterialTheme.typography.headlineSmall
-                    },
-                    modifier = Modifier.padding(vertical = 4.dp)
-                )
-            }
-            is GemtextElement.Preformatted -> {
-                Text(
-                    text = element.text,
-                    style = MaterialTheme.typography.bodyMedium,
-                    modifier = Modifier
-                        .padding(8.dp)
-                        .fillMaxWidth()
-                )
-            }
-            is GemtextElement.ListItem -> {
-                Text(
-                    text = "• ${element.text}",
-                    style = MaterialTheme.typography.bodyLarge,
-                    modifier = Modifier.padding(vertical = 4.dp)
-                )
-            }
-            is GemtextElement.Quote -> {
-                Text(
-                    text = "> ${element.text}",
-                    style = MaterialTheme.typography.bodyLarge.copy(
-                        color = MaterialTheme.colorScheme.secondary
-                    ),
-                    modifier = Modifier.padding(vertical = 4.dp)
-                )
-            }
-            is GemtextElement.Text -> {
+            is TextElement.Text -> {
                 Text(
                     text = element.text,
                     style = MaterialTheme.typography.bodyLarge,
                     modifier = Modifier.padding(vertical = 4.dp)
                 )
             }
-            is GemtextElement.EmptyLine -> {
-                Spacer(modifier = Modifier.height(8.dp))
+            is TextElement.EmptyLine -> {
+                Spacer(modifier = Modifier.height(12.dp))
             }
         }
     }
 }
+

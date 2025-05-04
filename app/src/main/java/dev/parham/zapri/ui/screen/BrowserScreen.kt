@@ -1,5 +1,6 @@
 package dev.parham.zapri.ui.screen
 
+import android.content.Intent
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
@@ -14,16 +15,17 @@ import dev.parham.zapri.data.history.HistoryRepository
 import dev.parham.zapri.data.model.PageData
 import dev.parham.zapri.ui.component.PageView
 import dev.parham.zapri.ui.component.ProtocolIcon
-import dev.parham.zapri.utils.UrlParser
+import dev.parham.zapri.utils.UrlUtils
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import androidx.core.net.toUri
 
 @Composable
 fun BrowserScreen(navController: NavHostController, modifier: Modifier = Modifier) {
     val context = LocalContext.current
     val historyRepository = remember { HistoryRepository() }
-    var currentUrl by remember { mutableStateOf(TextFieldValue("gemini://geminiprotocol.net")) }
+    var currentUrl by remember { mutableStateOf(TextFieldValue("gemini://geminiprotocol.net/")) }
     var pageData by remember {
         mutableStateOf(
             PageData(
@@ -63,7 +65,7 @@ fun BrowserScreen(navController: NavHostController, modifier: Modifier = Modifie
             placeholder = { Text("Enter URL...") },
             leadingIcon = {
                 ProtocolIcon(
-                    protocol = UrlParser.parse(currentUrl.text)?.protocol ?: "unknown",
+                    protocol = UrlUtils.parse(currentUrl.text)?.protocol ?: "unknown",
                     modifier = Modifier.size(24.dp)
                 )
             },
@@ -85,20 +87,23 @@ fun BrowserScreen(navController: NavHostController, modifier: Modifier = Modifie
             }
         )
 
-        val normalizedBaseUrl = if (currentUrl.text.endsWith("/")) currentUrl.text else "${currentUrl.text}/"
-
         PageView(
             pageData = pageData,
-            baseUrl = normalizedBaseUrl,
+            baseUrl = currentUrl.text,
             onLinkClick = { url ->
                 coroutineScope.launch {
-                    historyRepository.push(currentUrl.text)
                     val processedUrl = url.substringBefore(" ").trim()
-                    val appendedUrl = if (processedUrl.startsWith("gemini://")) {
-                        processedUrl
-                    } else {
-                        "$normalizedBaseUrl$processedUrl"
+                    
+                    // Check if URL is http/https and open in default browser
+                    if (processedUrl.startsWith("http://") || processedUrl.startsWith("https://")) {
+                        val intent = Intent(Intent.ACTION_VIEW, processedUrl.toUri())
+                        context.startActivity(intent)
+                        return@launch
                     }
+
+                    // Handle other protocols normally
+                    historyRepository.push(currentUrl.text)
+                    val appendedUrl = ProtocolHandler.resolveRelativeUrl(currentUrl.text, processedUrl)
                     currentUrl = TextFieldValue(appendedUrl)
                     val result = withContext(Dispatchers.IO) {
                         ProtocolHandler.fetch(appendedUrl, context)

@@ -2,7 +2,7 @@ package dev.parham.zapri.protocol.gemini
 
 import android.content.Context
 import dev.parham.zapri.data.model.PageData
-import dev.parham.zapri.utils.UrlParser
+import dev.parham.zapri.utils.UrlUtils
 import java.io.BufferedReader
 import java.io.InputStreamReader
 import java.io.OutputStreamWriter
@@ -31,7 +31,7 @@ object GeminiClient {
             )
         }
 
-        val parsedUrl = UrlParser.parse(url)
+        val parsedUrl = UrlUtils.parse(url)
             ?: return PageData(
                 statusCode = -1,
                 meta = "",

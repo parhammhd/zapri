@@ -7,6 +7,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ---
 
+## [1.2.0] - 2025-05-04
+### Added
+- Support for the Finger Protocol.
+- Support for the Text Protocol.
+- Support for opening http/https links in default browser.
+- Different colors for current protocol links, supported by Zapri (including future supported) links and other (like http/https/ftp) links.
+- New protocol icons for local:// and browser:// links.
+- A globe protocol icon for the web.
+### Changed
+- Rewrote UrlParser in UrlUtils.
+- Changed Gemini protocol icon to a rocket.
+- Cleaned up all Gemini Specific code from BrowserScreen.
+- Fixed some small bugs here and there.
+
 ## [1.1.1] - 2025-04-27
 ### Added
 - Gemtext support for preformatted toggle lines, quote lines, list items, lang parameter.

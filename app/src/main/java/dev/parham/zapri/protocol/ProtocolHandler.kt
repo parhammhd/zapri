@@ -6,12 +6,20 @@ import dev.parham.zapri.protocol.gemini.GeminiClient
 import dev.parham.zapri.protocol.gemini.GeminiParser
 import dev.parham.zapri.protocol.gemini.GeminiRenderer
 import dev.parham.zapri.protocol.gemini.GemtextElement
-import dev.parham.zapri.utils.UrlParser
+import dev.parham.zapri.protocol.finger.FingerClient
+import dev.parham.zapri.protocol.finger.FingerParser
+import dev.parham.zapri.protocol.finger.FingerElement
+import dev.parham.zapri.protocol.finger.FingerRenderer
+import dev.parham.zapri.protocol.text.TextClient
+import dev.parham.zapri.protocol.text.TextParser
+import dev.parham.zapri.protocol.text.TextElement
+import dev.parham.zapri.protocol.text.TextRenderer
+import dev.parham.zapri.utils.UrlUtils
 
 object ProtocolHandler {
 
     fun fetch(url: String, context: android.content.Context): PageData {
-        val parsedUrl = UrlParser.parse(url)
+        val parsedUrl = UrlUtils.parse(url)
             ?: return PageData(
                 statusCode = -1,
                 meta = "",
@@ -22,7 +30,9 @@ object ProtocolHandler {
 
         return when (parsedUrl.protocol) {
             "gemini" -> GeminiClient.fetch(url, context)
-            "gopher", "finger", "scroll", "nex", "spartan", "text" -> PageData(
+            "finger" -> FingerClient.fetch(url, context)
+            "text" -> TextClient.fetch(url, context)
+            "gopher", "scroll", "nex", "spartan" -> PageData(
                 statusCode = -1,
                 meta = "",
                 content = null,
@@ -39,25 +49,42 @@ object ProtocolHandler {
         }
     }
 
-    fun parseContent(pageData: PageData, baseUrl: String): List<GemtextElement> {
-        val parsedUrl = UrlParser.parse(baseUrl)
+    fun parseContent(pageData: PageData, baseUrl: String): List<Any> {
+        val parsedUrl = UrlUtils.parse(baseUrl)
             ?: return emptyList()
 
         return when (parsedUrl.protocol) {
             "gemini" -> pageData.content?.let { GeminiParser.parse(it, baseUrl) } ?: emptyList()
-            else -> emptyList() // Later, other protocol parsers can be added here
+            "finger" -> pageData.content?.let { FingerParser.parse(it) } ?: emptyList()
+            "text" -> pageData.content?.let { TextParser.parse(it) } ?: emptyList()
+            else -> emptyList()
+        }
+    }
+
+    fun resolveRelativeUrl(baseUrl: String, relativeUrl: String): String {
+        val parsedUrl = UrlUtils.parse(baseUrl) ?: return baseUrl
+        
+        return when (parsedUrl.protocol) {
+            "gemini" -> UrlUtils.resolveGeminiUrl(baseUrl, relativeUrl)
+            else -> {
+                // Default handling for other protocols
+                if (baseUrl.endsWith("/")) baseUrl + relativeUrl
+                else "$baseUrl/$relativeUrl"
+            }
         }
     }
 
     @Composable
-    fun renderContent(
-        elements: List<GemtextElement>,
+    fun RenderContent(
+        elements: List<Any>,
         onLinkClick: (String) -> Unit
     ) {
-        val parsedUrl = elements.firstOrNull()
-        // Currently assume it's Gemini (later: expand if different types)
         elements.forEach { element ->
-            GeminiRenderer.RenderGemtextElement(element, onLinkClick)
+            when (element) {
+                is GemtextElement -> GeminiRenderer.RenderGemtextElement(element, onLinkClick)
+                is FingerElement -> FingerRenderer.RenderFingerElement(element, onLinkClick)
+                is TextElement -> TextRenderer.RenderTextElement(element, onLinkClick)
+            }
         }
     }
 }
