@@ -3,7 +3,8 @@
 **Zapri** is a minimalist Android browser for the Gemini protocol and friends — fast, clean, and focused.
 
 ### 🚀 Features
-- Supports Gemini protocol
+- Supports Gemini, Finger and Text protocol
+- Different colors for different protocols (current, supported, unsupported)
 - Parses and renders Gemtext
 - Clickable links and heading support
 - Minimal Material 3 UI
@@ -11,10 +12,8 @@
 ### 📦 Tech Stack
 - Kotlin + Jetpack Compose
 - Custom protocol handler
-- Modular codebase (`app.main`, `protocol`, `ui`, etc.)
-
-### 📷 Screenshots
-*Coming soon!*
+- Custom URL parser
+- Modular codebase
 
 ### 📝 License
 
