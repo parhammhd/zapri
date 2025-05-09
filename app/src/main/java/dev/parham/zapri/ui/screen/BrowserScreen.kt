@@ -24,8 +24,6 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.ui.text.input.ImeAction
 
-
-
 @Composable
 fun BrowserScreen(navController: NavHostController, modifier: Modifier = Modifier) {
     val context = LocalContext.current
@@ -74,11 +72,16 @@ fun BrowserScreen(navController: NavHostController, modifier: Modifier = Modifie
                     modifier = Modifier.size(24.dp)
                 )
             },
-
             keyboardOptions = KeyboardOptions(imeAction = ImeAction.Go),
             keyboardActions = KeyboardActions(
                 onGo = {
                     coroutineScope.launch {
+                        val possibleWebUrl = currentUrl.text
+                        if (possibleWebUrl.startsWith("http://") || possibleWebUrl.startsWith("https://")) {
+                            val intent = Intent(Intent.ACTION_VIEW, possibleWebUrl.toUri())
+                            context.startActivity(intent)
+                            return@launch
+                        }
                         historyRepository.push(currentUrl.text)
                         val result = withContext(Dispatchers.IO) {
                             ProtocolHandler.fetch(currentUrl.text, context)
