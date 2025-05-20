@@ -20,6 +20,9 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import androidx.core.net.toUri
+import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.ui.text.input.ImeAction
 
 @Composable
 fun BrowserScreen(navController: NavHostController, modifier: Modifier = Modifier) {
@@ -69,22 +72,24 @@ fun BrowserScreen(navController: NavHostController, modifier: Modifier = Modifie
                     modifier = Modifier.size(24.dp)
                 )
             },
-            trailingIcon = {
-                Button(
-                    onClick = {
-                        coroutineScope.launch {
-                            historyRepository.push(currentUrl.text)
-                            val result = withContext(Dispatchers.IO) {
-                                ProtocolHandler.fetch(currentUrl.text, context)
-                            }
-                            pageData = result
+            keyboardOptions = KeyboardOptions(imeAction = ImeAction.Go),
+            keyboardActions = KeyboardActions(
+                onGo = {
+                    coroutineScope.launch {
+                        val possibleWebUrl = currentUrl.text
+                        if (possibleWebUrl.startsWith("http://") || possibleWebUrl.startsWith("https://")) {
+                            val intent = Intent(Intent.ACTION_VIEW, possibleWebUrl.toUri())
+                            context.startActivity(intent)
+                            return@launch
                         }
-                    },
-                    contentPadding = PaddingValues(0.dp)
-                ) {
-                    Text("Go")
+                        historyRepository.push(currentUrl.text)
+                        val result = withContext(Dispatchers.IO) {
+                            ProtocolHandler.fetch(currentUrl.text, context)
+                        }
+                        pageData = result
+                    }
                 }
-            }
+            )
         )
 
         PageView(
@@ -93,7 +98,7 @@ fun BrowserScreen(navController: NavHostController, modifier: Modifier = Modifie
             onLinkClick = { url ->
                 coroutineScope.launch {
                     val processedUrl = url.substringBefore(" ").trim()
-                    
+
                     // Check if URL is http/https and open in default browser
                     if (processedUrl.startsWith("http://") || processedUrl.startsWith("https://")) {
                         val intent = Intent(Intent.ACTION_VIEW, processedUrl.toUri())
