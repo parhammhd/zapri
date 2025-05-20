@@ -7,6 +7,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ---
 
+## [1.2.1] - 2025-05-20
+### Added
+- Support for opening http/https links also when typed inside the address bar. (contributed by [BardiyaFeili](https://github.com/BardiyaFeili))
+- Support for opening links by pressing enter. (contributed by [BardiyaFeili](https://github.com/BardiyaFeili))
+### Changed
+- Several edits to fix the Text Protocol(still not working correctly).
+### Removed
+- The "Go" button on the address bar. (contributed by [BardiyaFeili](https://github.com/BardiyaFeili))
+
 ## [1.2.0] - 2025-05-04
 ### Added
 - Support for the Finger Protocol.
