@@ -56,7 +56,17 @@ object ProtocolHandler {
         return when (parsedUrl.protocol) {
             "gemini" -> pageData.content?.let { GeminiParser.parse(it, baseUrl) } ?: emptyList()
             "finger" -> pageData.content?.let { FingerParser.parse(it) } ?: emptyList()
-            "text" -> pageData.content?.let { TextParser.parse(it) } ?: emptyList()
+            "text" -> {
+                val elements = mutableListOf<TextElement>()
+                // Add metadata info
+                pageData.meta.takeIf { it.isNotEmpty() }?.let {
+                    elements.add(TextElement.MetadataInfo(it))
+                    elements.add(TextElement.HorizontalRule)
+                }
+                // Add content
+                elements.addAll(pageData.content?.let { TextParser.parse(it) } ?: emptyList())
+                elements
+            }
             else -> emptyList()
         }
     }

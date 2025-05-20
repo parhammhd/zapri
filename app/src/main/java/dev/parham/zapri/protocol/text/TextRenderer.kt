@@ -69,6 +69,38 @@ object TextRenderer {
                     modifier = Modifier.padding(vertical = 4.dp)
                 )
             }
+            is TextElement.MetadataInfo -> {
+                Text(
+                    text = "ℹ ${element.text}",
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.outline,
+                    modifier = Modifier.padding(vertical = 2.dp)
+                )
+            }
+            is TextElement.StatusInfo -> {
+                Text(
+                    text = "✔ ${element.text}",
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.primary,
+                    modifier = Modifier.padding(vertical = 2.dp)
+                )
+            }
+            is TextElement.Divider -> {
+                Text(
+                    text = "—",
+                    style = MaterialTheme.typography.bodyLarge,
+                    color = MaterialTheme.colorScheme.outline,
+                    modifier = Modifier.padding(vertical = 8.dp)
+                )
+            }
+            is TextElement.HorizontalRule -> {
+                Text(
+                    text = "✂" + "・".repeat(10),
+                    style = MaterialTheme.typography.bodyLarge,
+                    color = MaterialTheme.colorScheme.outline,
+                    modifier = Modifier.padding(vertical = 8.dp)
+                )
+            }
             is TextElement.EmptyLine -> {
                 Spacer(modifier = Modifier.height(12.dp))
             }
